@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+  <title>SOS</title>
+  <meta charset='utf-8'>
+  <meta name="description" content="AngularJS and Angular Code Example for creating Invoices and Invoicing Application">
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.min.js"></script>
+  <script type="text/javascript" src="js/main.js"></script>
+</head>
+<body ng-app="invoicing" ng-controller="InvoiceCtrl" >
+  <div class="container" width="800px" id="invoice" >
+    <div class="row">
+      <div class="col-xs-12 heading" data-ng-hide="printMode">
+        INVOICE
+      </div>
+      <div class="col-xs-12 headingtaxinvoice" data-ng-hide="printmodelatest">
+       TAX INVOICE
+      </div>
+    </div>
+    <div class="row cols-xs-12" data-ng-hide="printmodelatest">
+      <table border="1px" width="100%">
+        <tbody>
+        <tr><td rowspan="3" >
+          SRI OM SAKTHI TRADERS </br>
+          N0:142, POONAMALLE HIGH ROAD, </br>
+          J.B.ESTATE, AVADI,CHENNAI-600 054 </br>
+          PH: 9789922970,9840600708 </br>
+          GSTIN/UIN : 33GXAPS3598J1ZV </br>
+          STATE NAME: TAMILNADU, CODE: 33
+        </td><td>Invoice No</td><td>Dated</td></tr>
+        <tr><td>Delivery Note</td><td>Mode/Terms of Payment</td></tr>
+        <tr><td>Supplier's Ref</td><td>Others References</td></tr>
+        <tr><td rowspan="4">Buyer</td><td>Buyer's Order No</td><td>Dated</td></tr>
+        <tr><td>Dispatch Document No</td><td>Delivery Note Date</td></tr>
+        <tr><td>Dispatched through</td><td>Destination </td></tr>
+        <tr><td colspan="2"> Terms of Delivery<br><br></td></tr>
+
+        <!--<tr><th>Question1</th><td>42%</td><td>58%</td><td>61%</td><td>39%</td></tr>-->
+        <!--<tr><th>Question2</th><td>53%</td><td>47%</td><td>69%</td><td>31%</td></tr>-->
+        <!--<tr><th>Question3</th><td>26%</td><td>74%</td><td>51%</td><td>49%</td></tr>-->
+        </tbody>
+
+
+      </table>
+    </div>
+    <div class="row branding" data-ng-hide="printMode">
+      <div class="col-xs-6">
+        <div class="invoice-number-container">
+          <label for="invoice-number">Invoice No</label><input type="text" id="invoice-number" ng-model="invoice.invoice_number" />
+        </div>
+      </div>
+      <div class="col-xs-6 logo-container">
+        <input type="file" id="imgInp" />
+        <img ng-hide="logoRemoved" id="company_logo" ng-src="{{ logo }}" alt="your image" width="300" />
+        <div>
+          <div class="noPrint" ng-hide="printMode">
+            <a ng-click="editLogo()" href >Edit Logo</a>
+            <a ng-click="toggleLogo()" id="remove_logo" href >{{ logoRemoved ? 'Show' : 'Hide' }} logo</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row infos">
+      <div class="col-xs-6">
+        <div class="input-container"><input type="text" ng-model="invoice.customer_info.name"/></div>
+        <div class="input-container"><input type="text" ng-model="invoice.customer_info.web_link"/></div>
+        <div class="input-container"><input type="text" ng-model="invoice.customer_info.address1"/></div>
+        <div class="input-container"><input type="text" ng-model="invoice.customer_info.address2"/></div>
+        <div class="input-container"><input type="text" ng-model="invoice.customer_info.postal"/></div>
+        <div class="input-container" data-ng-hide='printMode'>
+          <select ng-model='currencySymbol' ng-options='currency.symbol as currency.name for currency in availableCurrencies'></select>
+        </div>
+      </div>
+      <div class="col-xs-6 right">
+        <div class="input-container"><input type="text" ng-model="invoice.company_info.name"/></div>
+        <div class="input-container"><input type="text" ng-model="invoice.company_info.web_link"/></div>
+        <div class="input-container"><input type="text" ng-model="invoice.company_info.address1"/></div>
+        <div class="input-container"><input type="text" ng-model="invoice.company_info.address2"/></div>
+        <div class="input-container"><input type="text" ng-model="invoice.company_info.postal"/></div>
+      </div>
+    </div>
+    <div class="items-table">
+      <div class="row header">
+        <div class="col-xs-1">&nbsp;</div>
+        <div class="col-xs-3">Description of Goods</div>
+        <div class="col-xs-2">HSN/SAC</div>
+        <div class="col-xs-2">Quantity</div>
+        <div class="col-xs-2">Rate {{currencySymbol}}</div>
+        <div class="col-xs-2 text-right">Total</div>
+      </div>
+      <div class="row invoice-item" ng-repeat="item in invoice.items" ng-animate="'slide-down'">
+        <div class="col-xs-1 remove-item-container">
+          <a href ng-hide="printMode" ng-click="removeItem(item)" class="btn btn-danger">[X]</a>
+        </div>
+        <div class="col-xs-3 input-container">
+          <input ng-model="item.description" placeholder="Description" />
+        </div>
+        <div class="col-xs-2 input-container">
+          <input ng-model="item.qty" placeholder="HSN" />
+        </div>
+        <div class="col-xs-2 input-container">
+          <input ng-model="item.qty" value="1" size="4" ng-required ng-validate="integer" placeholder="Quantity" />
+        </div>
+        <div class="col-xs-2 input-container">
+          <input ng-model="item.cost" value="0.00" ng-required ng-validate="number" size="6" placeholder="Cost" />
+        </div>
+        <div class="col-xs-2 text-right input-container">
+          {{item.cost * item.qty | currency: currencySymbol}}
+        </div>
+      </div>
+      <div class="row invoice-item">
+        <div class="col-xs-12 add-item-container" ng-hide="printMode">
+          <a class="btn btn-primary" href ng-click="addItem()" >[+]</a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-10 text-right">Sub Total</div>
+        <div class="col-xs-2 text-right">{{invoiceSubTotal() | currency: currencySymbol}}</div>
+      </div>
+      <div class="row">
+        <div class="col-xs-10 text-right">SGST(%): <input ng-model="invoice.sgst" ng-validate="number" style="width:43px"></div>
+        <div class="col-xs-2 text-right">{{calculateTaxsgst() | currency: currencySymbol}}</div>
+      </div>
+      <div class="row">
+        <div class="col-xs-10 text-right">CGST(%): <input ng-model="invoice.cgst" ng-validate="number" style="width:43px"></div>
+        <div class="col-xs-2 text-right">{{calculateTaxcgst() | currency: currencySymbol}}</div>
+      </div>
+      <div class="row">
+        <div class="col-xs-10 text-right">Grand Total:</div>
+        <div class="col-xs-2 text-right">{{calculateGrandTotal() | currency: currencySymbol}}</div>
+      </div>
+    </div>
+    <div class="row noPrint actions">
+      <a href="#" class="btn btn-primary" ng-show="printMode" ng-click="printInfo()">Print</a>
+      <a href="#" class="btn btn-primary" ng-click="clearLocalStorage()">Reset</a>
+      <a href="#" class="btn btn-primary" ng-hide="printMode" ng-click="((printMode = true) && (printmodelatest=false))">Turn On Print Mode</a>
+      <a href="#" class="btn btn-primary" ng-show="printMode" ng-click="((printmodelatest = true) && (printMode=false))" >Turn Off Print Mode</a>
+    </div>
+  </div>
+
+  <div ng-hide="printMode" class="copy noPrint">
+    <a href="">Renceabishek</a> &amp;
+    <a href="">Bala venkatesh</a>
+    <a href="http://google.com">sostraders.</a>
+  </div>
+</body>
+</html>
